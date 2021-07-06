@@ -1,7 +1,9 @@
 from django.db.models.fields import DateField
-from django.shortcuts import render
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.views import View
-from django.http import HttpResponse    
+from django.http import HttpResponse
+from django.views.generic.base import RedirectView    
 from .forms import ImageUploadForm
 from .models import BusinessCard
 import datetime
@@ -29,18 +31,11 @@ def scannedCards(request):
 
     #     return render(request, "uploadBusinessCard/businessCards.html")
 
-    elif request.method == "DELETE":
-        # businessCardToBeDeleted = BusinessCard.objects.get(id=request.imageId)
-        # businessCardToBeDeleted.delete()
-        print('alok1')
-        # body_unicode = request.body.decode('utf-8')
-        
-        # content = body_unicode['imageId']
-        # json_params = json.loads(request.body)
-        print(request.GET.get('imageId'))
-        print('alok1')
-        BusinessCard.objects.get(pk=25).delete()
-        return render(request, "uploadBusinessCard/businessCards.html")
+    elif request.method == "POST":
+        # get the id of the business card that needs to be deleted from the database
+        businessCardId= request.POST.get('imageId') 
+        BusinessCard.objects.get(pk=businessCardId).delete()
+        return HttpResponseRedirect("/uploadBusinessCard/scannedCards")
 
 
 
