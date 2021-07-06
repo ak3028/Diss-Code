@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{%block page_title%}
+    Contact Details
+{%endblock%}
+{%block content%}
+<div class="container">
+<form action="/" method="post" accept-charset="utf-8"
+      enctype="multipart/form-data">
+   <label>Name</label>
+   <input name="name">
+
+   <label>Mobile Number</label>
+   <input name="mobileNumber">
+
+   <label>Organization</label>
+   <input name="Organization">
+    {% csrf_token %}
+</form>
+
+<div>
+
+{%endblock%}
+</html>

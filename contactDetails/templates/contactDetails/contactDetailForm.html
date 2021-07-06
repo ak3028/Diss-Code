@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{%block page_title%}
+    <b>Card Details</b>
+{%endblock%}
+{%block content%}
+<div class="container">
+
+<div style="height:20px"></div>
+<form>
+
+  <div class="form-group row">
+    <label for="cardText" class="col-sm-2 col-form-label"><b>Card Text</b></label>
+    <div class="col-sm-5">
+    <textarea class="form-control" id="inputCardText" rows="6" columns="4">{{cardInfo}}</textarea>
+    </div>
+  </div>
+
+  <div style="height:10px"></div>
+
+<div class="form-group row">
+    <label for="inputName" class="col-sm-2 col-form-label"><b>Name</b></label>
+    <div class="col-sm-5">
+      <input type="name" class="form-control" id="inputNmae" placeholder="">
+    </div>
+  </div>
+
+  <div style="height:10px"></div>
+
+  <div class="form-group row">
+    <label for="inputOrg" class="col-sm-2 col-form-label"><b>Organization</b></label>
+    <div class="col-sm-5">
+      <input type="organization" class="form-control" id="inputOrg" placeholder="">
+    </div>
+  </div>
+<div style="height:10px"></div>
+
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label"><b>Email</b></label>
+    <div class="col-sm-5">
+      <input type="email" class="form-control" id="inputEmail3" placeholder="">
+    </div>
+  </div>
+
+<div style="height:10px"></div>
+
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label"><b>Phone</b></label>
+    <div class="col-sm-5">
+      <input type="phone" class="form-control" id="inputPhone" placeholder="">
+    </div>
+  </div>
+
+ <div style="height:30px"></div> 
+ 
+  <div class="form-group row">
+    <div>
+    <center>
+      <button type="submit" class="btn btn-primary">Save Contact</button>
+    <center>
+    </div>
+  </div>
+</form>
+
+<div>
+
+{%endblock%}
+</html>
