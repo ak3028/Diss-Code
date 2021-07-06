@@ -56,6 +56,7 @@
    });
 
    $('#tblScannedCards').on("click", ".js-delete", function() {
+        var button = $(this)
         var imageId =  $(this).attr("image-id")
         result = confirm("Are you sure you want to delete this business card?")
         if(result)
@@ -71,11 +72,14 @@
                       }
                       });
         $.ajax({
+             method: 'POST',
              url: '/uploadBusinessCard/scannedCards',
              data: { 'imageId': imageId },
              datatype: 'json',
              success: function() {
-               alert('Business card deleted successfully!')
+               
+                 button.parents("tr").remove(); 
+                 alert("Business Card is deleted successfully.");
                }
           });
         }
