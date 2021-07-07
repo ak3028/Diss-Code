@@ -7,13 +7,13 @@
 <div class="container">
 
 <div style="height:20px"></div>
-<form action="/" method="post" accept-charset="utf-8"
+<form method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
-      
+
   <div class="form-group row">
     <label for="cardText" class="col-sm-2 col-form-label"><b>Card Text</b></label>
     <div class="col-sm-5">
-    <textarea class="form-control" id="inputCardText" rows="6" columns="4">{{cardInfo}}</textarea>
+    <textarea name="inputCardText" class="form-control" id="inputCardText" rows="6" columns="4">{{cardInfo}}</textarea>
     </div>
   </div>
 
@@ -61,6 +61,7 @@
     <center>
     </div>
   </div>
+  {% csrf_token %}
 </form>
 
 <div>
