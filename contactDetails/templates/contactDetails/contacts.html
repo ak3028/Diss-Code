@@ -10,9 +10,29 @@
 <div style="height:20px"></div>
 <form action="/" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
-      
-<h1> hello world </h1>
+<table id="tblScannedCards" class="table">
+  <thead>
+   <tr>
+    <th> Name</th>
+    <th> Organization</th>
+    <th> Email Id</th>
+    <th> Phone Number </th>
+   </tr>  
+  <thead>
+ {% for contact in contacts %}
+   <tr>
+     <td> {{contact.contactName}} </td>
+     <td> {{contact.organization}} </td>
+     <td> {{contact.email}} </td>
+     <td> {{contact.phone}} </td>
+     <td> <input type="button" value="Update" class="btn btn-primary js-process"></input>
+     <td> <button class="btn btn-danger js-delete" type="button">Delete</button>
+   </tr>
+ {% endfor %}
 
+
+</table>
+{% csrf_token %}
 </form>
 
 <div>
