@@ -1,7 +1,9 @@
+from contactDetails.models import Contact
 from django.shortcuts import render
 from pathlib import Path
 from PIL import Image
 import pytesseract
+from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
@@ -16,11 +18,27 @@ def index(request):
         return render(request, "contactDetails/contactDetailForm.html", {"cardInfo": cardInfoString})
 
     elif request.method == "POST":
+        contactName = request.POST['contactName']
+        organization = request.POST['organization']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        cardText = request.POST['inputCardText']
+        #populate the contact details in the model and save the contact in the database
+        #display the success message after saving the contact
+        contact = Contact(contactName=contactName, contactOrganization=organization, contactEmail=email, 
+                        contactPhoneNumber=phone,contactCardInfo=cardText)
+
+        contact.save()
+        messages.success(request,'Form submission successful')
         return render(request, "contactDetails/contactDetailForm.html")
     
+   
 
 def runOcrOnCard(imageUrl):
     cardInfo = pytesseract.image_to_string(Image.open(imageUrl))
     cardInfo = cardInfo.strip()
     return cardInfo
+
+
+
     
