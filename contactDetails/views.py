@@ -32,7 +32,9 @@ def index(request):
         messages.success(request,'Form submission successful')
         return render(request, "contactDetails/contactDetailForm.html")
     
-   
+def contacts(request):
+    return render(request, "contactDetails/contacts.html")
+
 
 def runOcrOnCard(imageUrl):
     cardInfo = pytesseract.image_to_string(Image.open(imageUrl))
