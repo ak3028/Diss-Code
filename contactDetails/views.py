@@ -4,6 +4,7 @@ from pathlib import Path
 from PIL import Image
 import pytesseract
 from django.contrib import messages
+from .models import Contact
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
@@ -33,7 +34,8 @@ def index(request):
         return render(request, "contactDetails/contactDetailForm.html")
     
 def contacts(request):
-    return render(request, "contactDetails/contacts.html")
+     contacts = Contact.objects.all() 
+     return render(request, "contactDetails/contacts.html",{"contacts": contacts})
 
 
 def runOcrOnCard(imageUrl):
