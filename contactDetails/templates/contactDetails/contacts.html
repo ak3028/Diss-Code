@@ -10,7 +10,7 @@
 <div style="height:20px"></div>
 <form action="/" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
-<table id="tblScannedCards" class="table">
+<table id="tblScannedCards" class="table table-bordered table-hover">
   <thead>
    <tr>
     <th> Name</th>
@@ -18,24 +18,39 @@
     <th> Email Id</th>
     <th> Phone Number </th>
    </tr>  
-  <thead>
+  </thead>
+  <tbody>
  {% for contact in contacts %}
+
    <tr>
      <td> {{contact.contactName}} </td>
-     <td> {{contact.organization}} </td>
-     <td> {{contact.email}} </td>
-     <td> {{contact.phone}} </td>
-     <td> <input type="button" value="Update" class="btn btn-primary js-process"></input>
-     <td> <button class="btn btn-danger js-delete" type="button">Delete</button>
-   </tr>
- {% endfor %}
+     <td> {{contact.contactOrganization}} </td>
+     <td> {{contact.contactEmail}} </td>
+     <td> {{contact.contactPhoneNumber}} </td>
 
+     {% comment %} jquery functionality is not working when the below code lines are included {% endcomment %}
+     {% comment %} <td> <input type="button" value="Update" class="btn btn-primary js-process"></input> </td>
+     <td> <button class="btn btn-danger js-delete" type="button">Delete</button> </td> {% endcomment %}
+   </tr>
+
+ {% endfor %}
+ </tbody>
+   
 
 </table>
 {% csrf_token %}
 </form>
 
 <div>
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+  $(document).ready( function () {
+    $('#tblScannedCards').DataTable();
+    });
+</script>
 
 {%endblock%}
+
 </html>
