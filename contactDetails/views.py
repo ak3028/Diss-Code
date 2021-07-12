@@ -30,7 +30,7 @@ def index(request):
                         contactPhoneNumber=phone,contactCardInfo=cardText)
 
         contact.save()
-        messages.success(request,'Form submission successful')
+        messages.success(request,'Contact has been successfully saved in the database.')
         return render(request, "contactDetails/contactDetailForm.html")
     
 def contacts(request):
