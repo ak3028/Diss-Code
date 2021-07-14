@@ -5,13 +5,14 @@ from PIL import Image
 import pytesseract
 from django.contrib import messages
 from .models import Contact
+from .imageProcessing import imagePreProcessor
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
 
 # Create your views here.
 def index(request):
-    if request.method == "GET":
+    if  request.method == "GET":
         base_path = str(Path(__file__).resolve().parent.parent)
         imageUrl = request.GET.get('imageUrl')
         imagePath = base_path + '/uploadedFiles/' + imageUrl
@@ -39,7 +40,9 @@ def contacts(request):
 
 
 def runOcrOnCard(imageUrl):
-    cardInfo = pytesseract.image_to_string(Image.open(imageUrl))
+
+    # cardInfo = pytesseract.image_to_string(Image.open(imageUrl))
+    cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
     cardInfo = cardInfo.strip()
     return cardInfo
 
