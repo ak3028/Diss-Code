@@ -6,7 +6,7 @@ import pytesseract
 from django.contrib import messages
 from .models import Contact
 from .imageProcessing import imagePreProcessor
-
+from .imageProcessing import textProcessor
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
 
@@ -16,8 +16,8 @@ def index(request):
         base_path = str(Path(__file__).resolve().parent.parent)
         imageUrl = request.GET.get('imageUrl')
         imagePath = base_path + '/uploadedFiles/' + imageUrl
-        cardInfoString = runOcrOnCard(imagePath)
-        return render(request, "contactDetails/contactDetailForm.html", {"cardInfo": cardInfoString})
+        cardInfoString, mobile, email = runOcrOnCard(imagePath)
+        return render(request, "contactDetails/contactDetailForm.html", {"cardInfo": cardInfoString, "mobileNo": mobile})
 
     elif request.method == "POST":
         contactName = request.POST['contactName']
@@ -40,11 +40,9 @@ def contacts(request):
 
 
 def runOcrOnCard(imageUrl):
-
-    # cardInfo = pytesseract.image_to_string(Image.open(imageUrl))
     cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
-    cardInfo = cardInfo.strip()
-    return cardInfo
+    cardText, mobile, email = textProcessor.processCardText(cardInfo)
+    return (cardText,mobile,email)
 
 
 
