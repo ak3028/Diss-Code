@@ -4,14 +4,17 @@ import spacy
 def processCardText(cardInfo):
     sanitisedText = getNonEmptyLinesFromText(cardInfo) # get string without any empty spaces
 
-    mob = extractPhoneNumber(sanitisedText)
+    phone = extractPhoneNumber(sanitisedText)
     # mob = getMobileNumber(sanitisedText)
     email = extractEmailIDFromText(sanitisedText)
     # remainingText = removeClassifiedFieldsFromText(sanitisedText, email, mob, "")
     # remainingText = sanitisedText
     # extractMobileAndRemoveItFromText(sanitisedText)
     name = extractNameFromText(sanitisedText)
-    return (sanitisedText, name, mob, email, "")
+
+    org = extractOrgFromText(sanitisedText)
+
+    return (sanitisedText, name, org, email, phone, "")
 
 def extractEmailIDFromText(text):
     # emailIds = re.findall(r'[\w\.-]+@[\w\.-]+', text) #working expression
@@ -67,11 +70,24 @@ def extractNameFromText(text):
     name = getNameUsingNlpLibrary(text)
     return name
 
+
+def extractOrgFromText(text):
+    name = getOrgUsingNlpLibrary(text)
+    return name
+
 def getNameUsingNlpLibrary(text):
     nlp = spacy.load("en_core_web_sm") #spacy.load('en')
     classifiedText = nlp(text)
     for entity in classifiedText.ents:
         if(entity.label_ == "PERSON"):
+           return entity.text
+    return ""
+
+def getOrgUsingNlpLibrary(text):
+    nlp = spacy.load("en_core_web_sm") #spacy.load('en')
+    classifiedText = nlp(text)
+    for entity in classifiedText.ents:
+        if(entity.label_ == "ORG"):
            return entity.text
     return ""
 
