@@ -4,10 +4,10 @@ from matplotlib.pyplot import tricontour
 import pytesseract
 import cv2
 import numpy as np
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.tag import pos_tag
 
+# import nltk
+# from nltk.tokenize import word_tokenize
+# from nltk.tag import pos_tag
 
 
 def getAllTextFromCard(imageURL):
