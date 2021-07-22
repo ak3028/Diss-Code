@@ -16,8 +16,13 @@ def index(request):
         base_path = str(Path(__file__).resolve().parent.parent)
         imageUrl = request.GET.get('imageUrl')
         imagePath = base_path + '/uploadedFiles/' + imageUrl
-        cardInfoString, mobile, email = runOcrOnCard(imagePath)
-        return render(request, "contactDetails/contactDetailForm.html", {"cardInfo": cardInfoString, "mobileNo": mobile})
+        cardInfoString, name, mobile, email, remainingText = runOcrOnCard(imagePath)
+        return render(request, "contactDetails/contactDetailForm.html", {"cardInfo": cardInfoString, 
+                                                                         "contactName": name,
+                                                                         "mobileNo": mobile,
+                                                                         "email": email,
+                                                                         "remainingText": remainingText
+                                                                         })
 
     elif request.method == "POST":
         contactName = request.POST['contactName']
@@ -41,8 +46,8 @@ def contacts(request):
 
 def runOcrOnCard(imageUrl):
     cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
-    cardText, mobile, email = textProcessor.processCardText(cardInfo)
-    return (cardText,mobile,email)
+    cardText, name, mobile, email, remainingText = textProcessor.processCardText(cardInfo)
+    return (cardText, name, mobile, email, remainingText)
 
 
 
