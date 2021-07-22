@@ -22,6 +22,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include("uploadBusinessCard.urls")), # ths will be the default page when the URL contains only the domain
     path('uploadBusinessCard/', include("uploadBusinessCard.urls")),
     path('contactDetails/', include("contactDetails.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
