@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-c=4p^kxo0&z-1x@avr&#m8+98zf0z4viu0d^2l&@l)n2#sdt6x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['businesscardextracter.azurewebsites.net']
 
 
 # Application definition
