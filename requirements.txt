@@ -1,6 +1,5 @@
 django==3.2.5
-libleptonica-dev
-tesseract-ocr
+pytesseract
 Spacy
 numpy
 opencv-python-headless==4.5.1.48
