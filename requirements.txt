@@ -6,5 +6,5 @@ pytesseract
 matplotlib
 bootstrap4
 Pillow
-tesseract
+tesseract-ocr
 
