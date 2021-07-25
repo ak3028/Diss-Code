@@ -1,10 +1,10 @@
 django==3.2.5
+tesseract-ocr
 Spacy
 numpy
 opencv-python-headless==4.5.1.48
-pytesseract
 matplotlib
 bootstrap4
 Pillow
-tesseract-ocr
+
 
