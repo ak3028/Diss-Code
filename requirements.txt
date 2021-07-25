@@ -1,7 +1,7 @@
-django==3.2.5,
-Spacy,
-numpy,
-pytesseract,
-matplotlib,
-bootstrap4,
+django==3.2.5
+Spacy
+numpy
+pytesseract
+matplotlib
+bootstrap4
 Pillow
