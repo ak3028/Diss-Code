@@ -5,3 +5,4 @@ pytesseract
 matplotlib
 bootstrap4
 Pillow
+opencv-python
