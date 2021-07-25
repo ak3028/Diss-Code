@@ -1,8 +1,9 @@
 django==3.2.5
 Spacy
 numpy
+opencv-python
 pytesseract
 matplotlib
 bootstrap4
 Pillow
-opencv
+
