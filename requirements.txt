@@ -1,4 +1,5 @@
 django==3.2.5
+libleptonica-dev
 tesseract-ocr
 Spacy
 numpy
