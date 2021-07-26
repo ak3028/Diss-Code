@@ -1,5 +1,6 @@
 django==3.2.5
 pytesseract
+tesseract-ocr
 Spacy
 numpy
 opencv-python-headless==4.5.1.48
