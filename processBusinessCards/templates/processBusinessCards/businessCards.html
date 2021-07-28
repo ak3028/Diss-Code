@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{%block head%}
+{%endblock%}
+
+{%block page_title%}
+    Business Cards
+{%endblock%}
+
+{%block content%}
+<body>
+<form action="/" method="post" accept-charset="utf-8"
+      enctype="multipart/form-data">
+<table id="tblScannedCards" class="table">
+  <thead>
+   <tr>
+    <th> Card Id</th>
+    <th> Uploaded By </th>
+    <th> Uploaded Date </th>
+    <th> IsProcessed </th>
+    <th> ImageLink </th>
+   </tr>  
+  <thead>
+ {% for card in cardList %}
+   <tr>
+     <td> {{card.id}} </td>
+     <td> {{card.submittedBy}} </td>
+     <td> {{card.submittedDate}} </td>
+     <td> {{card.isProcessed}} </td>
+     <td> <a href="{{card.image.url}}" target="_blank">View Card</a></td>
+     <td> <input type="button" value="Run OCR" image-url="{{card.image.url}}" class="btn btn-primary js-process" {% if card.isProcessed == 'Y' %} disabled {%endif%}"></input>
+     <td> <button image-id="{{card.id}}" class="btn btn-danger js-delete" type="button">Delete</button>
+   </tr>
+ {% endfor %}
+
+
+</table>
+{% csrf_token %}
+</form>
+</body>
+
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+   $(document).ready(function() {
+   });
+
+   $('#tblScannedCards').on("click", ".js-process", function() {
+        var imageUrl =  $(this).attr("image-url")
+        {% comment %} this url should correctly point to the relative url. Currently its hardcoded {% endcomment %}
+        var new_url = '/businessContacts/contactDetail' + '?imageUrl=' + imageUrl;
+        // var new_url = 'http://127.0.0.1:8000/contactDetails/contactDetail' + '?imageUrl=' + imageUrl;
+        window.location.href = new_url;
+
+   });
+
+   $('#tblScannedCards').on("click", ".js-delete", function() {
+        var button = $(this)
+        var imageId =  $(this).attr("image-id")
+        result = confirm("Are you sure you want to delete this business card?")
+        if(result)
+        {% comment %} {
+           var new_url = '/uploadBusinessCard/scannedCards' + '?imageId=' + imageId + '?action=delete';
+           window.location.href = new_url;
+        } {% endcomment %}
+       {
+       $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);     
+                      }
+                      });
+        $.ajax({
+             method: 'POST',
+             url: '/processBusinessCards',
+             data: { 'imageId': imageId },
+             datatype: 'json',
+             success: function() {
+               
+                 button.parents("tr").remove(); 
+                 alert("Business Card is deleted successfully.");
+               }
+          });
+        }
+        {% comment %} this url should correctly point to the relative url. Currently its hardcoded {% endcomment %}
+
+   });
+</script>
+{%endblock%}
+ 
+</html>
