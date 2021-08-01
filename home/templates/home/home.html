@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+
+{%block page_title%}
+    <b>Home</b>
+{%endblock%}
+
+{%block content%}
+
+<div style="margin-left:20px">
+   <h5 style="color:black;">Please follow the below instructions to scrape a business card</h5>
+   <h8 style="color:black;">1. Click on the link "Upload Business Card" to upload a business card image from your local directory.</h8>
+   <br>
+   <h8 style="color:black;">2. Then click on the link "Process Business Card" to navigate to the processing page.</h8>
+   </br>
+   <h8 style="color:black;">Please follow the below instructions to scrape a business card</h8>
+   
+</div>
+
+{% csrf_token %}
+</form>
+
+<div>
+{%endblock%}
+
+
+</html>

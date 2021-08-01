@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'uploadBusinessCard',
     'businessContacts',
     'processBusinessCards',
+    'home',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,9 +61,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-             BASE_DIR / "processBusinessCards" / "templates",
+            BASE_DIR / "processBusinessCards" / "templates",
             BASE_DIR / "uploadBusinessCard" / "templates",
             BASE_DIR / "businessContacts" / "templates",
+            BASE_DIR / "home" / "templates",
             BASE_DIR / "templates"
         ],
         'APP_DIRS': True,

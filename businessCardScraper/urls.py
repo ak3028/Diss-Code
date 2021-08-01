@@ -21,6 +21,7 @@ from django.conf import settings
 
 
 urlpatterns = [
+    path('', include("home.urls")),
     path('admin/', admin.site.urls),
     path('uploadBusinessCard', include("uploadBusinessCard.urls")), # ths will be the default page when the URL contains only the domain
     path('processBusinessCards', include("processBusinessCards.urls")),
