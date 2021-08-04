@@ -1,5 +1,9 @@
 import re
 import spacy
+import pytesseract
+
+def getTextFromOCR(image):
+    return pytesseract.image_to_string(image)
 
 def processCardText(cardInfo):
     sanitisedText = getNonEmptyLinesFromText(cardInfo) # get string without any empty spaces
@@ -76,6 +80,13 @@ def extractOrgFromText(text):
     return name
 
 def getNameUsingNlpLibrary(text):
+    # text = 'Satthew University\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n'
+    # text = 'Hannah Dakota Fanning\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # identified
+    # text = 'HANNAH DAKOTA FANNING\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # No - identifies Hannah as org.
+    # text='Mansion Limited\n\James Paul McCartney\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # Identifies only Paul McCartney
+    # text='James Paul McCartney\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # identifies full name when its in the beggning of the text
+    # text ='James Paul McCartney\nKey Account Manager\nDeer Park Court, Donnington Wood, Telford, Shropshire TF2 7NB\nTel: 0845 075 5544\nMobile: 07766 472618\nEmail: alan.stewart@lyreco.com www.lyreco.com\n' # works
+    # text ='Key Account Manager\nJames Paul McCartney\nDeer Park Court, Donnington Wood, Telford, Shropshire TF2 7NB\nTel: 0845 075 5544\nMobile: 07766 472618\nEmail: alan.stewart@lyreco.com www.lyreco.com\n'
     nlp = spacy.load("en_core_web_sm") #spacy.load('en')
     classifiedText = nlp(text)
     for entity in classifiedText.ents:

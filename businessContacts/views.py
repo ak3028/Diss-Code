@@ -2,11 +2,11 @@ from businessContacts.models import BusinessContact
 from django.shortcuts import render
 from pathlib import Path
 from PIL import Image
-import pytesseract
 from django.contrib import messages
 from .models import BusinessContact
 from .imageProcessing import imagePreProcessor
 from .imageProcessing import textProcessor
+from .imageProcessing import imageProcessor
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
 
@@ -16,8 +16,10 @@ def index(request):
         base_path = str(Path(__file__).resolve().parent.parent)
         imageUrl = request.GET.get('imageUrl')
         imagePath = base_path + '/uploadedFiles/' + imageUrl
-        cardInfoString, name, org, email, mobile, remainingText = runOcrOnCard(imagePath)
-        return render(request, "businessContacts/contactDetailForm.html", {"cardInfo": cardInfoString, 
+        isCardBoundaryDetected, cardInfoString, name, org, email, mobile, remainingText = runOcrOnCard(imagePath)
+        return render(request, "businessContacts/contactDetailForm.html", {
+                                                                        "isCardBoundaryDetected":isCardBoundaryDetected,
+                                                                        "cardInfo": cardInfoString, 
                                                                          "contactName": name,
                                                                          "mobileNo": mobile,
                                                                          "email": email,
@@ -46,9 +48,16 @@ def businessContacts(request):
 
 
 def runOcrOnCard(imageUrl):
-    cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
+    image = imageProcessor.getImageFromURL(imageUrl)
+    preProcessedImage, isCardBoundaryDetected = imageProcessor.processImageForOcr(image)
+    cardInfo = textProcessor.getTextFromOCR(preProcessedImage)
+    # cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
     cardText, name, org, email, phone, remainingText = textProcessor.processCardText(cardInfo)
-    return (cardText, name, org, email, phone, remainingText)
+    if isCardBoundaryDetected:
+       message = "Boundary of the card was detected in the image"
+    else:
+       message = "Boundary of the card was not detected in the image"
+    return (message, cardText, name, org, email, phone, remainingText)
 
 
 
