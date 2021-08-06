@@ -11,6 +11,7 @@ import json
 from django.http import QueryDict
 from django.views.generic.edit import CreateView
 from uploadBusinessCard import models
+from django.contrib import messages
 
 
 
@@ -26,6 +27,7 @@ class CreateImageUploadView(View):
             businessCard = BusinessCard(image=request.FILES["businessCardImage"], submittedBy = "admin", 
                                                submittedDate = datetime.datetime.now(), isProcessed = "N")
             businessCard.save()
+            messages.success(self.request, 'Business card is uploaded successfully')
 
         return render(request, "uploadBusinessCard/imageUpload.html", {
             "form": submittedForm
