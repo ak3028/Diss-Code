@@ -10,8 +10,7 @@ class BusinessCard(models.Model):
 
 
 # this function is used to overreide the string object which is used to represent
-# an onject in the database. Its used when we query the database from the python shell
+# an object in the database. Its used when we query the database from the python shell
     def __str__(self):
         return f"{self.id}, {self.image}"
 
-# Create your models here.
