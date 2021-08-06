@@ -1,12 +1,18 @@
+from os import remove
 import re
 import spacy
 import pytesseract
 
+
 def getTextFromOCR(image):
     return pytesseract.image_to_string(image)
 
-def processCardText(cardInfo):
-    sanitisedText = getNonEmptyLinesFromText(cardInfo) # get string without any empty spaces
+def processCardText(extractedText):
+    
+    #when phone numbers have more than one space they are not recognized.
+    #extractedText = 'FABRIKAM, INC.\n\nEric Rothenberg, Owner, License #M45678\n\n57 N. Walnut Drive, Suite 120, New Orleans,\nLA 12329\n\nPhone (304)  555-0112 + Fax (304) 555-0114\n\x0c'
+
+    sanitisedText = sanitizeText(extractedText) # get string without any empty spaces
 
     phone = extractPhoneNumber(sanitisedText)
     # mob = getMobileNumber(sanitisedText)
@@ -14,7 +20,7 @@ def processCardText(cardInfo):
     # remainingText = removeClassifiedFieldsFromText(sanitisedText, email, mob, "")
     # remainingText = sanitisedText
     # extractMobileAndRemoveItFromText(sanitisedText)
-    name = extractNameFromText(sanitisedText)
+    name = extractContactName(sanitisedText, email) # passing email for the fallback of the
 
     org = extractOrgFromText(sanitisedText)
 
@@ -29,13 +35,23 @@ def extractEmailIDFromText(text):
     return emailId
     
 
-def getNonEmptyLinesFromText(text):
+def sanitizeText(text):
     lines = text.split("\n")
     string_without_empty_lines = ""
     nonEmptyLines = [line for line in lines if line.strip()]
+    # It was noticed in some business cards the ocr creates a white space near the '@' symbol
+    # in the email. This needs to be removed so that the email is identified by the regex.
     for line in nonEmptyLines:
+      if '@' in line:
+          indexOfAt = line.find('@')
+          if line[indexOfAt+1] == " ":
+              line = line[:indexOfAt+1] + '' + line[indexOfAt+2:]
+          if line[indexOfAt-1] == " ":
+              line = line[:indexOfAt-1] + '' + line[indexOfAt:]
       string_without_empty_lines += line + "\n"
     return string_without_empty_lines
+
+
 
 
 def extractPhoneNumber(text):
@@ -63,16 +79,96 @@ def removeClassifiedFieldsFromText(text, email, phone, organization):
     if email!= "":
        cleanedText = text.replace(email,"")
     
-    if phone!="":
+    if phone!= "":
       cleanedText = cleanedText.replace(phone,"")
 
     remainingText = getNonEmptyLinesFromText(cleanedText)
 
     return remainingText
 
-def extractNameFromText(text):
+def extractContactName(text, email):
     name = getNameUsingNlpLibrary(text)
+    if name !='':
+        return name
+
+    else:    
+        if email != '':
+           text = removeEmailFromText(email,text)
+           partialNameFromEmail = extractPartialNameFromEmailId(email)
+           name = findNameFromEmailInCardText(partialNameFromEmail, text)
+        if name != "":
+           return name
+        else:
+            name = guessNameFromCardText(text)
+            return name
+
+def guessNameFromCardText(text):
+    name=''
+    linesIntheText = text.split('\n')
+    for line in linesIntheText:
+        numberOfWordInName = len(line.split(" "))
+        if numberOfWordInName == 2 or numberOfWordInName ==3:
+           if len(line.strip()) > 6:
+              name = line.strip()
+              return name
     return name
+            
+
+
+
+
+        
+
+def removeEmailFromText(email,text):
+    return text.replace(email,"")
+
+       
+
+def extractContactNameOldMethod(text, email):
+    nameFromNLP = getNameUsingNlpLibrary(text)
+    nameFromEmail = ''
+    if email != '':
+       nameFromEmail = extractNameFromEmailId(email)
+    
+    if nameFromNLP=='' and nameFromEmail=='':
+       return ''
+
+    elif nameFromNLP=='' and nameFromEmail != '' :
+       name = findNameFromEmailInCardText(nameFromEmail,text.replace(email,""))
+       if name=='':
+           return nameFromEmail
+       return name
+
+    elif nameFromNLP !='' and nameFromEmail == '':
+        return nameFromNLP
+    
+    elif nameFromNLP !='' and nameFromEmail != '':
+        if nameFromEmail.casefold() in nameFromNLP.casefold():
+           return nameFromNLP
+        else:
+           name = findNameFromEmailInCardText(nameFromEmail,text.replace(email,""))
+           return name
+        # return nameFromNLP
+
+    return ''
+
+
+# this method can be tested with card - Rafal Ulatee
+def extractPartialNameFromEmailId(email):
+    name = email.split('@')[0]
+    if '.' in name:
+        return name.split('.')[0]
+    if '_' in name:
+        return name.split('_')[0]
+    return name
+
+def findNameFromEmailInCardText(nameFromEmail, text):
+    linesIntheText = text.split('\n')
+    for line in linesIntheText:
+        if len(nameFromEmail)>2 and nameFromEmail.casefold() in line.casefold():  # sometimes email contain only initials, in that case return empty string
+            return line.strip()
+        
+    return ''
 
 
 def extractOrgFromText(text):
@@ -80,6 +176,7 @@ def extractOrgFromText(text):
     return name
 
 def getNameUsingNlpLibrary(text):
+    # testing name extraction using spacy
     # text = 'Satthew University\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n'
     # text = 'Hannah Dakota Fanning\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # identified
     # text = 'HANNAH DAKOTA FANNING\nTITLE OR COMPANY\n»\nSOQnHE\n12 YOUR BUSINESS ROAD\nCITY, STATE\n55555\n555-555-5555,\nMAIL@EMAILADDRESS.COM\nYOUR INSTAGRAM\nYOUR FACEBOOK\n' # No - identifies Hannah as org.
@@ -93,6 +190,10 @@ def getNameUsingNlpLibrary(text):
         if(entity.label_ == "PERSON"):
            return entity.text
     return ""
+
+
+
+    
 
 def getOrgUsingNlpLibrary(text):
     nlp = spacy.load("en_core_web_sm") #spacy.load('en')
@@ -133,7 +234,7 @@ def getMobileNumber(text):
     # MOB:\d\d\d.\d\d\d.\d\d\d\d - MOB:755 232 9158
     # MOB:\d\d\d[-.\s]\d\d\d[-.\s]\d\d\d\d - - MOB:755 232 9158 (with any kind of separator)
 
-
+# alok source - https://gist.github.com/AjjuSingh/cab9252f30bc321069e2c94fae83fe1b 
 phoneRegex = re.compile(r'''(
     (\d{3}|\(\d{3}\))? # area code
     (\s|-|\.)? # separator

@@ -7,9 +7,6 @@ import numpy as np
 import math
 
 
-
-
- 
  
 def getImageFromURL(imageURL):
     return cv2.imread(imageURL)
@@ -40,15 +37,12 @@ def processImageForOcr(image):
     contours = cv2.findContours(imageCanny,cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = getContours_BasedOn_CV2_Version(contours)
     contours = sorted(contours, key=cv2.contourArea, reverse=True) [:5]
+    # c = max(contours, key = cv2.contourArea)
     cardContour = ''
     for contour in contours:
         peri = cv2.arcLength(contour,False) # true ensures that the contour is closed 
         approx = cv2.approxPolyDP(contour, 0.02*peri, True)
-        # screenCnt = approx
-        # break
-        # cardContour = approx
-        # break
-        if len(approx) == 4:
+        if len(approx) == 4 and cv2.contourArea(contour) > 50000: #sometimes an image contains a closed figure which should not be considered as the biggest contour while deciding the card boundary, so we discard such figures.
             cardContour = approx
             break
     
@@ -66,8 +60,8 @@ def processImageForOcr(image):
     imageForOcr = imageToGrayScale(warpedImage)
     showImage('Image for OCR', imageForOcr)
     isCardBoundaryDetected =True
+    print(isCardBoundaryDetected)
     return imageForOcr, isCardBoundaryDetected
-
 
 def getContours_BasedOn_CV2_Version(cntrs):
     if len(cntrs) == 2:
@@ -81,8 +75,6 @@ def getContours_BasedOn_CV2_Version(cntrs):
 
     return contours
         
-
-
 def resizeImage(image):
     ratio = image.shape[0] / 500.0
     image = resize(image, height = 500) # alok can make his function here
@@ -118,6 +110,7 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
 
     # return the resized image
     return resized
+
 def applyPerspectiveTransformAndThreshold(orig, screenCnt, ratio):
 
     warped = four_point_transform(orig, screenCnt.reshape(4, 2) * ratio)
@@ -177,34 +170,6 @@ def order_points(pts):
 	# return the ordered coordinates
 	return rect
 
-
-def reorder(myPoints):
-
-    myPoints = myPoints.reshape((4, 2))
-    myPointsNew = np.zeros((4, 1, 2), dtype=np.int32)
-    add = myPoints.sum(1)
-
-    myPointsNew[0] = myPoints[np.argmin(add)]
-    myPointsNew[3] =myPoints[np.argmax(add)]
-    diff = np.diff(myPoints, axis=1)
-    myPointsNew[1] =myPoints[np.argmin(diff)]
-    myPointsNew[2] = myPoints[np.argmax(diff)]
-
-    return myPointsNew
-
-
-def drawRectangle(img,biggest,thickness):
-    cv2.line(img, (biggest[0][0][0], biggest[0][0][1]), (biggest[1][0][0], biggest[1][0][1]), (255, 0, 0), thickness)
-    cv2.line(img, (biggest[0][0][0], biggest[0][0][1]), (biggest[2][0][0], biggest[2][0][1]), (255, 0, 0), thickness)
-    cv2.line(img, (biggest[3][0][0], biggest[3][0][1]), (biggest[2][0][0], biggest[2][0][1]), (255, 0, 0), thickness)
-    cv2.line(img, (biggest[3][0][0], biggest[3][0][1]), (biggest[1][0][0], biggest[1][0][1]), (255, 0, 0), thickness)
-
-    return img
-
-def getContours(image):
-    return cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-
 def dilateImage(imageCanny):
     kernel = np.ones((5,5))
     return cv2.dilate(imageCanny, kernel, iterations = 2)
@@ -213,88 +178,23 @@ def applyErosion(imageDilated):
     kernel = np.ones((5,5), np.uint8)
     return cv2.erode(imageDilated, kernel, iterations = 1)
 
-def alignImage(originalImage,cannyImage):
-    lines = cv2.HoughLinesP(cannyImage, 1, math.pi / 180.0, 100, minLineLength=100, maxLineGap=5)
-
-    angles = []
-
-    for [[x1, y1, x2, y2]] in lines:
-        cv2.line(originalImage, (x1, y1), (x2, y2), (255, 0, 0), 3)
-        angle = math.degrees(math.atan2(y2 - y1, x2 - x1))
-        angles.append(angle)
-
-    cv2.imshow("Detected lines", originalImage)    
-    key = cv2.waitKey(0)
-
-    median_angle = np.median(angles)
-    img_rotated = ndimage.rotate(originalImage, median_angle)
-    return img_rotated
-    print(f"Angle is {median_angle:.04f}")
-    cv2.imwrite('rotated.jpg', img_rotated)    
-
-def addImage(image):
-    imageArray.append(image)
-
-
 def cannyEdgeDetection(image):
     # return cv2.Canny(image, 80, 80, apertureSize=3)    
     # return cv2.Canny(image, 75, 200, apertureSize=3) # doesnt give good results   
     # return cv2.Canny(image, 50, 200, apertureSize=5) # gives better result for tilted cards with apperturesize = 5
-    return cv2.Canny(image, 50, 200, apertureSize=3) # aperture size is reduced to avoid small contorus that is formed by noise
+    return cv2.Canny(image, 50, 200, apertureSize=5) # aperture size is reduced to avoid small contorus that is formed by noise
+    # apperture size of 5 is better in reading characters in some card like carol soh card
 
 def imageToGrayScale(image):
-    # image = cv2.imread(img)
-    # cv2.imshow('Original',image)
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
   
 def applyGaussianBlur(image):
     return cv2.GaussianBlur(image, (5,5), 0)  # 5,5 can be used | higher the kernel value more the blur
 
-def checkBlur(img):
-    img = cv2.resize(img, (1000,600))
-    grayImg = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    grayImg = cv2.equalizeHist(np.copy(grayImg))
-    fft = np.fft.fft(grayImg)
-    avgFFT = np.average(fft)
-    threshFFT_x, threshFFT_y = np.where(fft> 1.25*avgFFT)
-    return len(threshFFT_x) > 130000
-
-# def biggestContour(contours):
-#     biggest = np.array([])
-#     max_area =0
-#     for i in contours:
-#         area = cv2.contourArea(i)
-#         if area > 5000:
-#             peri = cv2.arcLength(i, True)
-#             approx =  cv2.approxPolyDP(i, 0.02 * peri, True)
-#             if area > max_area and len(approx) >= 3:
-#                 biggest = approx
-#                 max_area = area
-#     return biggest, max_area
-
-def biggestContour(contours):
-    biggest = np.array([])
-    maxArea = 0
-    for i in contours:
-        area = cv2.contourArea(i)
-        if area > maxArea:
-            biggest = i
-            maxArea = area
-    return biggest, maxArea
-
-
-def preprocess(sent):
+def preprocessUsingNLTK(sent):
     sent = nltk.word_tokenize(sent)
     sent = nltk.pos_tag(sent)
     return sent
-
-# largestcontour = biggestContour(regions)
-# text = pytesseract.image_to_string(image)
-
-# tokenised_text = preprocess(text)
-# print(tokenised_text)
-
-
 
 def showImage(imageType, image):
     pass
@@ -302,66 +202,6 @@ def showImage(imageType, image):
     # cv2.waitKey(0)
     # cv2.destroyAllWindows() 
 
-
-def processCardText(image):
-    cardInfo = pytesseract.image_to_string(image)
-    sanitisedText = getNonEmptyLinesFromText(cardInfo)
-    print(sanitisedText)
-    return ("",sanitisedText)
-
-
-
-def getNonEmptyLinesFromText(text):
-    lines = text.split("\n")
-    string_without_empty_lines = ""
-    nonEmptyLines = [line for line in lines if line.strip()]
-    for line in nonEmptyLines:
-      string_without_empty_lines += line + "\n"
-    return string_without_empty_lines
-
-
-# start code here
-# image = Image.open("/Users/alokkumar/Documents/CardImages/Card_2_tilted_.jpeg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_1_tilted_.jpg")  
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_5.jpg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_4.jpeg") #edge cannot be detected due to same colour background
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_7_.jpg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_6_w.jpg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Zara_N.jpg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_3_.jpeg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/Card_6_w.jpg")
-# image = cv2.imread("/Users/alokkumar/Documents/CardImages/008.jpeg")
-# image = cv2.imread("/Users/alokkumar/Documents/test_images/022.jpeg")
-# image = cv2.imread("/Users/alokkumar/Documents/test_images/007_.jpeg")
-# warpedImage = getImageForOCR(image)
-# processCardText(warpedImage)
-
-# end code here
-
-
-
-
-
-    # imageEroded = applyErosion(imageDilate)
-    # showImage('Eroded Image', imageEroded)
-
-    # imageContour = originalImage
-    # imageBiggestContour = originalImage
-
-    # contours,hierarchy = getContours(imageEroded)
-
-    # cv2.drawContours(imageContour, contours, -1, (0, 255, 0), 10)
-    # showImage('ImageContours', imageContour)
-    
-    # biggest, maxArea = biggestContour(contours)
-    # print(biggest)
-    # biggest = reorder(biggest[3])
-    # cv2.drawContours(imageBiggestContour, biggest, -1, (0, 255, 0), 10)
-    # imageBiggestContour =  drawRectangle(imageBiggestContour, biggest,2)
-    # showImage('BiggestContour', imageBiggestContour)
-    
-    # # alignedImage = alignImage(originalImage, imageCanny)
-    # # showImage('AlignedImage', alignedImage)
 
 
 

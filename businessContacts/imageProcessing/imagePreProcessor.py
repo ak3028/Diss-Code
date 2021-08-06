@@ -16,10 +16,9 @@ from . import imageProcessor
 #     # imageGrayScale = imageToGrayScale(image)
 #     return pytesseract.image_to_string(image)
 
-def getImageForOCR(imageURL):
-    image = cv2.imread(imageURL)
-    return imageProcessor.processImage(image)
-
+# `def getImageForOCR(imageURL):
+#     image = cv2.imread(imageURL)
+#     return imageProcessor.processImage(image)`
 
 
 # def imageToGrayScale(image):
