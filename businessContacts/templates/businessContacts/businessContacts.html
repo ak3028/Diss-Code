@@ -1,4 +1,5 @@
 
+
 {% extends "base.html" %}
 
 {%block page_title%}
@@ -11,14 +12,12 @@
 <form action="/" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
 <table id="tblScannedCards" class="table">
-  <thead>
+ <thead>
    <tr>
     <th style="background-color:gray"> Name</th>
     <th style="background-color:gray"> Organization</th>
     <th style="background-color:gray"> Email Id</th>
     <th style="background-color:gray"> Phone Number </th>
-    <th> </th>
-    <th>  </th>
    </tr>  
   </thead>
   <tbody>
@@ -31,8 +30,8 @@
      <td> {{contact.contactPhoneNumber}} </td>
 
      {% comment %} jquery functionality is not working when the below code lines are included {% endcomment %}
-     <td> <input type="button" value="Update" class="btn btn-primary js-process"></input> </td>
-     <td> <button class="btn btn-danger js-delete" type="button">Delete</button> </td> 
+     <!-- <td> <input type="button" value="Update" class="btn btn-primary js-process"></input> </td>
+     <td> <button class="btn btn-danger js-delete" type="button">Delete</button> </td>  -->
    </tr>
 
  {% endfor %}
@@ -45,17 +44,18 @@
 {%endblock%}
 
 {%block script%}
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
-<script src="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap.min.css "></script> 
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
+<script src="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap.min.css "></script>  -->
+<!-- //cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css     -->
 
-   {% comment %} <script src="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css"></script>
-   <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>  {% endcomment %}
-
+<script src="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css  "></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript">
   $(document).ready( function () {
     $('#tblScannedCards').DataTable();
     });
+
 
 </script>
 

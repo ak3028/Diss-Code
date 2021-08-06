@@ -29,7 +29,7 @@
      <td> {{card.submittedDate}} </td>
      <td> {{card.isProcessed}} </td>
      <td> <a href="{{card.image.url}}" target="_blank">View Card</a></td>
-     <td> <input type="button" value="Process Card" image-url="{{card.image.url}}" class="btn btn-primary js-process" {% if card.isProcessed == 'Y' %} disabled {%endif%}"></input>
+     <td style="width:10px"> <input type="button" value="Process Card" image-url="{{card.image.url}}" class="btn btn-primary js-process" {% if card.isProcessed == 'Y' %} disabled {%endif%}"></input>
      <td> <button image-id="{{card.id}}" class="btn btn-danger js-delete" type="button">Delete</button>
    </tr>
  {% endfor %}
@@ -79,6 +79,10 @@
           });
         }
    });
+
+  
+
+
 </script>
 {%endblock%}
  
