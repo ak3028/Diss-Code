@@ -9,11 +9,15 @@
       enctype="multipart/form-data">
  {{ form }}
  <input class="btn btn-primary" type="submit" value="Upload Card"/>
-  
+
     {% csrf_token %}
 </form>
 
-<div>
+<div id="divSuccess" style="margin:10px">
+    {% for message in messages %}
+   <label style="color:green"{% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </label>
+    {% endfor %}
+</div>
 
 {%endblock%}
 </html>
