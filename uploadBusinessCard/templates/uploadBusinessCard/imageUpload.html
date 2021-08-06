@@ -7,10 +7,9 @@
 <div class="container">
 <form action="/uploadBusinessCard" method="post" accept-charset="utf-8"
       enctype="multipart/form-data">
-    {{ form }}
-    {% comment %} <label for="image">Upload a Business Card Image</label>
-    <input id="image" name="image" type="file" value="" /> {% endcomment %}
-    <input class="btn btn-primary" type="submit" value="Upload Card" />
+ {{ form }}
+ <input class="btn btn-primary" type="submit" value="Upload Card"/>
+  
     {% csrf_token %}
 </form>
 
