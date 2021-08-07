@@ -7,16 +7,19 @@ from .models import BusinessContact
 from .imageProcessing import imagePreProcessor
 from .imageProcessing import textProcessor
 from .imageProcessing import imageProcessor
+from uploadBusinessCard.models import BusinessCard
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 base_path = Path(__file__).resolve().parent.parent
+
 
 # Create your views here.
 def index(request):
     if  request.method == "GET":
         base_path = str(Path(__file__).resolve().parent.parent)
         imageUrl = request.GET.get('imageUrl')
+        cardId = request.GET.get('cardId')
         imagePath = base_path + '/uploadedFiles/' + imageUrl
-        isCardBoundaryDetected, cardInfoString, name, org, email, mobile, remainingText = runOcrOnCard(imagePath)
+        isCardBoundaryDetected, cardInfoString, name, org, email, mobile = runOcrOnCard(imagePath)
         return render(request, "businessContacts/contactDetailForm.html", {
                                                                         "isCardBoundaryDetected":isCardBoundaryDetected,
                                                                         "cardInfo": cardInfoString, 
@@ -24,7 +27,7 @@ def index(request):
                                                                          "mobileNo": mobile,
                                                                          "email": email,
                                                                          "organization" : org,
-                                                                         "remainingText": remainingText
+                                                                         "cardId" : cardId
                                                                          })
 
     elif request.method == "POST":
@@ -33,12 +36,19 @@ def index(request):
         email = request.POST['email']
         phone = request.POST['phone']
         cardText = request.POST['inputCardText']
+        cardID = request.POST['cardId']
         #populate the contact details in the model and save the contact in the database
         #display the success message after saving the contact
         contact = BusinessContact(contactName=contactName, contactOrganization=organization, contactEmail=email, 
                         contactPhoneNumber=phone,contactCardInfo=cardText)
 
         contact.save()
+
+        # update the isProcessed field for the processed business card.
+        businessCard = BusinessCard.objects.get(id=cardID)
+        businessCard.isProcessed = 'Y'
+        businessCard.save()
+
         messages.success(request,'Contact has been successfully saved in the database.')
         return render(request, "businessContacts/contactDetailForm.html")
     
@@ -52,12 +62,12 @@ def runOcrOnCard(imageUrl):
     preProcessedImage, isCardBoundaryDetected = imageProcessor.processImageForOcr(image)
     cardInfo = textProcessor.getTextFromOCR(preProcessedImage)
     # cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
-    cardText, name, org, email, phone, remainingText = textProcessor.processCardText(cardInfo)
+    cardText, name, org, email, phone = textProcessor.processCardText(cardInfo)
     if isCardBoundaryDetected:
        message = "Boundary of the card was detected in the image"
     else:
        message = "Boundary of the card was not detected in the image"
-    return (message, cardText, name, org, email, phone, remainingText)
+    return (message, cardText, name, org, email, phone)
 
 
 

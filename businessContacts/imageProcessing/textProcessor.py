@@ -24,7 +24,7 @@ def processCardText(extractedText):
 
     org = extractOrgFromText(sanitisedText)
 
-    return (sanitisedText, name, org, email, phone, "")
+    return (sanitisedText, name, org, email, phone)
 
 def extractEmailIDFromText(text):
     # emailIds = re.findall(r'[\w\.-]+@[\w\.-]+', text) #working expression
