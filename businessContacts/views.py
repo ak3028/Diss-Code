@@ -12,7 +12,7 @@ from uploadBusinessCard.models import BusinessCard
 base_path = Path(__file__).resolve().parent.parent
 
 
-# Create your views here.
+# This method is called when the user clicks the "Process" button against a business card in the page - Process Business Cards
 def index(request):
     if  request.method == "GET":
         base_path = str(Path(__file__).resolve().parent.parent)
