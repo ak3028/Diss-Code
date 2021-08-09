@@ -5,7 +5,7 @@
 {%endblock%}
 
 {%block page_title%}
-    Business Cards
+    Process Business Cards
 {%endblock%}
 
 {%block content%}
@@ -80,6 +80,11 @@
           });
         }
    });
+
+   $(document).ready(function(){
+       $(".active").removeClass("active");
+      $("#process-tab").addClass("active");
+});
 
   
 

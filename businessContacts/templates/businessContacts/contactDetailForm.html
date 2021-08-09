@@ -15,9 +15,10 @@
     <div class="col-sm-5">
     <textarea name="inputCardText" class="form-control" id="inputCardText" rows="6" columns="4">{{cardInfo}}</textarea>
     </div>
-    <div class="col-sm-3">
+    <!-- This is required only while testing the app to see if the canny edge detection was successfull or not -->
+    <!-- <div class="col-sm-3">
       <label style="color:green">{{isCardBoundaryDetected}}</label>
-    </div>
+    </div> -->
   </div>
 
   <div style="height:10px"></div>
@@ -87,6 +88,17 @@
 </form>
 
 <div>
+
+{%endblock%}
+
+
+{%block script%}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".active").removeClass("active");
+       $("#process-tab").addClass("active");
+ });
+ </script>
 
 {%endblock%}
 </html>

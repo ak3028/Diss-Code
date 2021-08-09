@@ -20,7 +20,7 @@ def index(request):
         imagePath = base_path + '/uploadedFiles/' + imageUrl
         isCardBoundaryDetected, cardInfoString, name, org, email, mobile = runOcrOnCard(imagePath)
         return render(request, "businessContacts/contactDetailForm.html", {
-                                                                        "isCardBoundaryDetected":isCardBoundaryDetected,
+                                                                        "isCardBoundaryDetected":isCardBoundaryDetected, #this field is required only for testing the app.
                                                                         "cardInfo": cardInfoString, 
                                                                          "contactName": name,
                                                                          "mobileNo": mobile,
@@ -63,9 +63,9 @@ def runOcrOnCard(imageUrl):
     # cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
     cardText, name, org, email, phone = textProcessor.processCardText(cardInfo)
     if isCardBoundaryDetected:
-       message = "Boundary of the card was detected in the image"
+       message = "Boundary of the card was detected in the image."
     else:
-       message = "Boundary of the card was not detected in the image"
+       message = "Boundary of the card was not detected in the image. Limited image processing was performed"
     return (message, cardText, name, org, email, phone)
 
 
