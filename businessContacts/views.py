@@ -4,7 +4,6 @@ from pathlib import Path
 from PIL import Image
 from django.contrib import messages
 from .models import BusinessContact
-from .imageProcessing import imagePreProcessor
 from .imageProcessing import textProcessor
 from .imageProcessing import imageProcessor
 from uploadBusinessCard.models import BusinessCard
