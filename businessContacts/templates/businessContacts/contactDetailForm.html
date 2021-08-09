@@ -75,15 +75,15 @@
     </div>
   </div>
 
-  {% if messages %}
-<ul class="messages">
+{% if messages %}
+ <ul class="messages">
     {% for message in messages %}
     <li style="color:green" {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
     {% endfor %}
-</ul>
+ </ul>
 {% endif %}
 
-  {% csrf_token %}
+{% csrf_token %}
 </form>
 
 <div>

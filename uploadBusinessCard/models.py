@@ -2,10 +2,10 @@ from django.db import models
 
 class BusinessCard(models.Model):
     # imageLocation = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="businessCardImages", null=True)
+    image = models.ImageField(upload_to="businessCardImages", null=False)
     submittedBy = models.CharField(max_length=200)
-    submittedDate = models.DateField(null=True)
-    isProcessed = models.CharField(max_length=1, null=True)
+    submittedDate = models.DateField(null=False)
+    isProcessed = models.CharField(max_length=1, null=False)
     
 
 
