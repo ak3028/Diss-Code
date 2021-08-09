@@ -74,17 +74,17 @@ def extractPhoneNumber(text):
     return ""
 
 
-def removeClassifiedFieldsFromText(text, email, phone, organization):
-    cleanedText = text
-    if email!= "":
-       cleanedText = text.replace(email,"")
+# def removeClassifiedFieldsFromText(text, email, phone, organization):
+#     cleanedText = text
+#     if email!= "":
+#        cleanedText = text.replace(email,"")
     
-    if phone!= "":
-      cleanedText = cleanedText.replace(phone,"")
+#     if phone!= "":
+#       cleanedText = cleanedText.replace(phone,"")
 
-    remainingText = getNonEmptyLinesFromText(cleanedText)
+#     remainingText = getNonEmptyLinesFromText(cleanedText)
 
-    return remainingText
+#     return remainingText
 
 def extractContactName(text, email):
     name = getNameUsingNlpLibrary(text)
