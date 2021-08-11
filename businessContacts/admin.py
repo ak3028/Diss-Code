@@ -1,3 +1,12 @@
+from businessContacts.models import BusinessContact
 from django.contrib import admin
 
-# Register your models here.
+class BusinessContactAdmin(admin.ModelAdmin):
+    list_filter = ("contactName","contactOrganization", "contactOrganization", "contactPhoneNumber","contactCardInfo",)
+    list_display = ("contactName","contactOrganization", "contactOrganization", "contactPhoneNumber","contactCardInfo",)
+
+admin.site.register(BusinessContact,BusinessContactAdmin)
+
+
+  
+
