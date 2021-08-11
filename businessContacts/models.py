@@ -8,3 +8,4 @@ class BusinessContact(models.Model):
     contactEmail = models.EmailField(max_length=100)
     contactPhoneNumber = models.CharField(max_length=20)
     contactCardInfo = models.CharField(max_length=1000)
+    businessCard = models.ForeignKey(BusinessCard, on_delete=models.CASCADE)

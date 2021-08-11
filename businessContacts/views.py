@@ -36,17 +36,19 @@ def index(request):
         phone = request.POST['phone']
         cardText = request.POST['inputCardText']
         cardID = request.POST['cardId']
+
+        card = BusinessCard.objects.get(id=cardID)
         #populate the contact details in the model and save the contact in the database
         #display the success message after saving the contact
         contact = BusinessContact(contactName=contactName, contactOrganization=organization, contactEmail=email, 
-                        contactPhoneNumber=phone,contactCardInfo=cardText)
+                        contactPhoneNumber=phone,contactCardInfo=cardText, businessCard = card)
 
         contact.save()
 
         # update the isProcessed field for the processed business card.
-        businessCard = BusinessCard.objects.get(id=cardID)
-        businessCard.isProcessed = 'Y'
-        businessCard.save()
+        
+        card.isProcessed = 'Y'
+        card.save()
 
         messages.success(request,'Contact has been successfully saved in the database.')
         return render(request, "businessContacts/contactDetailForm.html")
@@ -62,6 +64,8 @@ def runOcrOnCard(imageUrl):
     cardInfo = textProcessor.getTextFromOCR(preProcessedImage)
     # cardInfo = imagePreProcessor.getAllTextFromCard(imageUrl)
     cardText, name, org, email, phone = textProcessor.processCardText(cardInfo)
+
+    #this field can be returned to the UI to check if the edges of the card was detected or not.
     if isCardBoundaryDetected:
        message = "Boundary of the card was detected in the image."
     else:
