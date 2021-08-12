@@ -42,13 +42,18 @@ def sanitizeText(text):
     # It was noticed in some business cards the ocr creates a white space near the '@' symbol
     # in the email. This needs to be removed so that the email is identified by the regex.
     for line in nonEmptyLines:
-      if '@' in line:
-          indexOfAt = line.find('@')
-          if line[indexOfAt+1] == " ":
-              line = line[:indexOfAt+1] + '' + line[indexOfAt+2:]
-          if line[indexOfAt-1] == " ":
-              line = line[:indexOfAt-1] + '' + line[indexOfAt:]
-      string_without_empty_lines += line + "\n"
+       if '@' in line:
+           indexOfAt = line.find('@')
+           indexOfDot = line.find('.')
+           if len(line) > indexOfAt+1 and line[indexOfAt+1] == " ":
+               line = line[:indexOfAt+1] + '' + line[indexOfAt+2:]
+           if len(line) > indexOfDot+1 and line[indexOfDot+1] == " ":
+               line = line[:indexOfDot+1] + '' + line[indexOfDot+2:]
+           if indexOfAt-1>0 and line[indexOfAt-1] == " ":
+               line = line[:indexOfAt-1] + '' + line[indexOfAt:]
+           if indexOfDot-1>0 and line[indexOfDot-1] == " ":
+               line = line[:indexOfDot-1] + '' + line[indexOfDot:]
+       string_without_empty_lines += line + "\n"
     return string_without_empty_lines
 
 

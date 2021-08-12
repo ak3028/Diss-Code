@@ -19,9 +19,9 @@ def processImageForOcr(image):
 
     imageGrayScale = imageToGrayScale(resizedImage)
 
-    grayImageForOcr = originalImage # get a copy of image to be passed directly for ocr in case the boundary of the card is not detected
+    # grayImageForOcr = originalImage # get a copy of image to be passed directly for ocr in case the boundary of the card is not detected
 
-    # grayImageForOcr = imageGrayScale
+    grayImageForOcr = imageGrayScale
 
     showImage('GrayScale', imageGrayScale)
 
