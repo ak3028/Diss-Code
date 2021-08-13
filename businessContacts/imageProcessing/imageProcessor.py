@@ -1,6 +1,6 @@
 from PIL import Image
-import matplotlib as m
-from matplotlib.pyplot import tricontour
+# import matplotlib as m
+# from matplotlib.pyplot import tricontour
 import pytesseract
 import cv2
 import numpy as np
