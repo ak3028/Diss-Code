@@ -39,10 +39,9 @@ def processImageForOcr(image):
     contours = cv2.findContours(imageCanny,cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = getContours_BasedOn_CV2_Version(contours)
     contours = sorted(contours, key=cv2.contourArea, reverse=True) [:5]
-    # c = max(contours, key = cv2.contourArea)
     cardContour = ''
     for contour in contours:
-        peri = cv2.arcLength(contour,False) # true ensures that the contour is closed 
+        peri = cv2.arcLength(contour,True) # true ensures that the contour is closed 
         approx = cv2.approxPolyDP(contour, 0.02*peri, True)
         if len(approx) == 4 and cv2.contourArea(contour) > 50000: #sometimes an image contains a closed figure which should not be considered as the biggest contour while deciding the card boundary, so we discard such figures.
             cardContour = approx
@@ -55,7 +54,7 @@ def processImageForOcr(image):
     cv2.drawContours(resizedImage, [cardContour], -1, (0, 255, 0), 2)
     showImage('ImageContours', resizedImage)
     
-    warpedImage = applyPerspectiveTransformAndThreshold(originalImage, cardContour, ratio)
+    warpedImage = applyPerspectiveTransform(originalImage, cardContour, ratio)
     
     showImage('ImageWarped', warpedImage)
 
@@ -113,9 +112,9 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # return the resized image
     return resized
 
-def applyPerspectiveTransformAndThreshold(orig, screenCnt, ratio):
+def applyPerspectiveTransform(orig, cardContour, ratio):
 
-    warped = four_point_transform(orig, screenCnt.reshape(4, 2) * ratio)
+    warped = four_point_transform(orig, cardContour.reshape(4, 2) * ratio)
 
     return warped
 
