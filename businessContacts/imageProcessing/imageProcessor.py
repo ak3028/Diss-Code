@@ -7,37 +7,28 @@ import numpy as np
 import math
 
 
- 
+# This method is called from the UI 
+# to get the Image from the Input URL 
 def getImageFromURL(imageURL):
     return cv2.imread(imageURL)
 
+# This method is the main method that performs all the image processing
+# and return the final image to be passed to the OCR engine
 def processImageForOcr(image):
 
-    originalImage = image.copy()
+    # This image is passed directly for ocr in case the boundary of the card is not detected
+    imageGrayScaleOriginal = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
    
-    resizedImage, ratio = resizeImage(image)
+    resizedImage, ratio = resizeImage(imageGrayScaleOriginal)
 
-    imageGrayScale = imageToGrayScale(resizedImage)
+    imageGaussianBlur = cv2.GaussianBlur(resizedImage, (5,5), 0)  # 5,5 can be used | higher the kernel value more the blur
+    
+    imageCanny = cv2.Canny(imageGaussianBlur, 50, 200, apertureSize=5)
 
-    # grayImageForOcr = originalImage # get a copy of image to be passed directly for ocr in case the boundary of the card is not detected
 
-    grayImageForOcr = imageGrayScale
-
-    showImage('GrayScale', imageGrayScale)
-
-    imageGaussianBlur = applyGaussianBlur(imageGrayScale)
-
-    showImage('Blurred', imageGaussianBlur)
-
-    imageCanny = cannyEdgeDetection(imageGaussianBlur)
   
-    showImage('CannnyImage', imageCanny)
-
-    # imageDilate = dilateImage(imageCanny)
-    # showImage('Dilated Image', imageCanny)
-
     contours = cv2.findContours(imageCanny,cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = getContours_BasedOn_CV2_Version(contours)
+    contours = contours[0]
     contours = sorted(contours, key=cv2.contourArea, reverse=True) [:5]
     cardContour = ''
     for contour in contours:
@@ -49,38 +40,26 @@ def processImageForOcr(image):
     
     if cardContour == '':
         isCardBoundaryDetected = False
-        return grayImageForOcr, isCardBoundaryDetected
+        return imageGrayScaleOriginal, isCardBoundaryDetected
 
-    cv2.drawContours(resizedImage, [cardContour], -1, (0, 255, 0), 2)
-    showImage('ImageContours', resizedImage)
     
-    warpedImage = applyPerspectiveTransform(originalImage, cardContour, ratio)
+    warpedImage = applyPerspectiveTransform(imageGrayScaleOriginal, cardContour, ratio)
     
-    showImage('ImageWarped', warpedImage)
 
-    imageForOcr = imageToGrayScale(warpedImage)
-    showImage('Image for OCR', imageForOcr)
-    isCardBoundaryDetected =True
-    print(isCardBoundaryDetected)
-    return imageForOcr, isCardBoundaryDetected
+    isCardBoundaryDetected = True
 
-def getContours_BasedOn_CV2_Version(cntrs):
-    if len(cntrs) == 2:
-        contours = cntrs[0]
-    
-    elif len(cntrs) == 3:
-        contours = cntrs[1]
+    return warpedImage, isCardBoundaryDetected
 
-    else:
-        raise Exception("Contour tuples should either have a length of 2 or 3")
 
-    return contours
-        
+# This method just returns a resized image 
+# The image is resized while preserving the aspect ratio    
 def resizeImage(image):
     ratio = image.shape[0] / 500.0
-    image = resize(image, height = 500) # alok can make his function here
+    image = resize(image, height = 500)
     return image, ratio
 
+# This is the generic method that we use for resizing the image.
+# Source - 
 def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # initialize the dimensions of the image to be resized and
     # grab the image size
@@ -112,12 +91,16 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # return the resized image
     return resized
 
+# This method applied perspective correction on the input image
+# and returns the warped image that can be passed to the OCR engine.
+# source - 
 def applyPerspectiveTransform(orig, cardContour, ratio):
 
     warped = four_point_transform(orig, cardContour.reshape(4, 2) * ratio)
 
     return warped
 
+# source - 
 def four_point_transform(image, pts):
 	# obtain a consistent order of the points and unpack them
 	# individually
@@ -151,6 +134,7 @@ def four_point_transform(image, pts):
 	# return the warped image
 	return warped
 
+# source - 
 def order_points(pts):
 	# initialzie a list of coordinates that will be ordered
 	# such that the first entry in the list is the top-left,
@@ -171,37 +155,7 @@ def order_points(pts):
 	# return the ordered coordinates
 	return rect
 
-def dilateImage(imageCanny):
-    kernel = np.ones((5,5))
-    return cv2.dilate(imageCanny, kernel, iterations = 2)
 
-def applyErosion(imageDilated):
-    kernel = np.ones((5,5), np.uint8)
-    return cv2.erode(imageDilated, kernel, iterations = 1)
-
-def cannyEdgeDetection(image):
-    # return cv2.Canny(image, 80, 80, apertureSize=3)    
-    # return cv2.Canny(image, 75, 200, apertureSize=3) # doesnt give good results   
-    # return cv2.Canny(image, 50, 200, apertureSize=5) # gives better result for tilted cards with apperturesize = 5
-    return cv2.Canny(image, 50, 200, apertureSize=5) # aperture size is reduced to avoid small contorus that is formed by noise
-    # apperture size of 5 is better in reading characters in some card like carol soh card
-
-def imageToGrayScale(image):
-    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-  
-def applyGaussianBlur(image):
-    return cv2.GaussianBlur(image, (5,5), 0)  # 5,5 can be used | higher the kernel value more the blur
-
-def preprocessUsingNLTK(sent):
-    sent = nltk.word_tokenize(sent)
-    sent = nltk.pos_tag(sent)
-    return sent
-
-def showImage(imageType, image):
-    pass
-    # cv2.imshow(imageType, image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows() 
 
 
 

@@ -1,18 +1,17 @@
-from os import remove
 import re
 import spacy
 import pytesseract
 
 
+# This method extracts text from business card image 
 def getTextFromOCR(image):
     return pytesseract.image_to_string(image)
 
+# This is the main method which performs all the 
+# text classification to 
 def processCardText(extractedText):
     
-    #when phone numbers have more than one space they are not recognized.
-    #extractedText = 'FABRIKAM, INC.\n\nEric Rothenberg, Owner, License #M45678\n\n57 N. Walnut Drive, Suite 120, New Orleans,\nLA 12329\n\nPhone (304)  555-0112 + Fax (304) 555-0114\n\x0c'
-    # extractedText = 'FABRIKAM, INC.\n\nEric Rothenberg, Owner, License #M45678\n\n57 N. Walnut Drive, Suite 120, New Orleans,\nLA 12329\n\nPhone 07911 123456  +44 20 7946 0957 + Fax 020 7946 0957\n\x0c'
-    sanitisedText = sanitizeText(extractedText) # get string without any empty spaces
+    sanitisedText = sanitizeText(extractedText) 
 
     phone = extractPhoneNumber(sanitisedText)
     # mob = getMobileNumber(sanitisedText)
@@ -26,6 +25,8 @@ def processCardText(extractedText):
 
     return (sanitisedText, name, org, email, phone)
 
+# This method returns the first string which matches
+# the email id pattern defined by the regular expression
 def extractEmailIDFromText(text):
     emailIds = re.findall(r'[\w\.-]+@[_\w\.]+', text)
     if len(emailIds)==0:
@@ -34,12 +35,14 @@ def extractEmailIDFromText(text):
     return emailId
     
 
+# This method removes the vertical white spaces
+# from the recognized string returned by the OCR
+# It also removes any whitespace that is mistakenly
+# introduced in the Email Id during OCR
 def sanitizeText(text):
     lines = text.split("\n")
     string_without_empty_lines = ""
     nonEmptyLines = [line for line in lines if line.strip()]
-    # It was noticed with some business cards the ocr created a white space near the '@' and "." symbols
-    # in the email. This needed to be removed so that the email is identified by the regex.
     for line in nonEmptyLines:
        if '@' in line:
            indexOfAt = line.find('@')
@@ -57,8 +60,20 @@ def sanitizeText(text):
 
 
 
-
+# This function returns the identified phone number that matches 
+# the regular expression defined in the function
+# Source - 
 def extractPhoneNumber(text):
+
+    phoneRegex = re.compile(r'''(
+    (\d{3}|\(\d{3}\))? # captures the area code
+    (\s|-|\.)? # separator can be -  a white space, a "-" or a "."
+    (\d{3}) # captures last 4 digits
+    (\s|-|\.)? # separator can be -  a white space, a "-" or a "."
+    (\d{4}) # captures last 4 digits
+    (\s*(ext|x|ext.|ext:|Ext.|Ext:)\s*(\d{2,5}))? # extension
+    )''', re.VERBOSE)
+
     matches = []
     result = phoneRegex.findall(text)
     if len(result) > 0:
@@ -73,7 +88,7 @@ def extractPhoneNumber(text):
 
 
 
-
+# This method identifies the name field from the text
 def extractContactName(text, email):
     name = getNameUsingNlpLibrary(text)
     if name !='':
@@ -103,9 +118,6 @@ def guessNameFromCardText(text):
             
 
 
-
-
-        
 
 def removeEmailFromText(email,text):
     return text.replace(email,"")
@@ -200,14 +212,7 @@ def getOrgUsingNlpLibrary(text):
 
 
 # alok source - https://gist.github.com/AjjuSingh/cab9252f30bc321069e2c94fae83fe1b 
-phoneRegex = re.compile(r'''(
-    (\d{3}|\(\d{3}\))? # captures the area code
-    (\s|-|\.)? # separator can be -  a white space, a "-" or a "."
-    (\d{3}) # captures last 4 digits
-    (\s|-|\.)? # separator can be -  a white space, a "-" or a "."
-    (\d{4}) # captures last 4 digits
-    (\s*(ext|x|ext.|ext:|Ext.|Ext:)\s*(\d{2,5}))? # extension
-    )''', re.VERBOSE)
+
 
 
     # ((\d{3}|\(\d{3}\))?(\s|-|\.)?(\d{3})(\s|-|\.)(\d{4})(\s*(ext|x|ext.|ext:|Ext.|Ext:)\s*(\d{2,5}))?)
